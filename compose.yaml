@@ -1,0 +1,33 @@
+# CampusReserve as copies behind a proxy.
+#
+#   docker compose up -d --build --scale api=2
+#   (wait ~8 s: the proxy looks api up again every 5 s)
+#   docker compose logs api          # each copy prints its own tokens
+#   docker compose --profile load run --rm --no-deps k6 run /load/tokens.js
+#
+# load/run.sh does the token lookup and the k6 call in one step.
+
+services:
+  api:
+    # The HTTP server from the starter's Dockerfile, listening on 8080. No host
+    # port is published, so any number of copies can run side by side; the
+    # proxy is the only way in from outside the stack.
+    build: .
+
+  proxy:
+    image: nginx:1.30.6-alpine
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  k6:
+    image: grafana/k6:2.3.0
+    # Only on demand: a plain `up` skips this service. It declares no
+    # depends_on, so a `run` cannot pull api back to one copy, but pass
+    # --no-deps anyway.
+    profiles: ["load"]
+    volumes:
+      - ./load:/load:ro

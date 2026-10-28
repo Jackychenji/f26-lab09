@@ -87,3 +87,16 @@ python -m campusreserve_analytics revenue --events ../events.jsonl --format csv
 - Architecture: `ARCHITECTURE.md`
 - Setup and the per-module gates: `SETUP.md`
 - CI: `.github/workflows/ci.yml`, which runs the same two commands as above.
+
+## Lab 9: running it as copies
+
+`compose.yaml` and `load/` are the lab's additions; `BOUNDARIES.md` holds the
+write-up. `docker compose up -d --build --scale api=2`, wait about 8 seconds,
+then `bash load/run.sh tokens.js` or `bash load/run.sh bookings.js`.
+
+## Tools used for this lab
+
+Claude Code 2.1.268 (VS Code extension) running Claude Opus 5.5
+(`claude-opus-5-5`). It traced the wiring, drafted `compose.yaml`, the k6
+scripts, and `BOUNDARIES.md`, and ran the stack and the scripts. No transcripts
+are committed (lab forks are public).
